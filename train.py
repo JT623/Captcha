@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from models import CNN
+from Testmodel import CNN
 from datasets import CaptchaData
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, ToTensor
