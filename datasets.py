@@ -1,38 +1,51 @@
-
 from PIL import Image
 import torch
 from torch.utils.data import Dataset
 import os
-
-model_path = './checkpoints/model.pth'
-testpath = '/home/data/'
-result_path = '/result/submission.csv'
-
+import pandas as pd
 
 source = [str(i) for i in range(0, 10)]
 source += [chr(i) for i in range(97, 97+26)]
 source += [chr(i) for i in range (65,65+26)]
 alphabet = ''.join(source)
 
-
 def img_loader(img_path):
     img = Image.open(img_path)
     return img.convert('RGB')
 
 def make_dataset(data_path, alphabet, num_class, num_char):
-    img_names = os.listdir(data_path)
+    # img_names = os.listdir(data_path)
+    # samples = []
+    # for img_name in img_names:
+    #     img_path = os.path.join(data_path, img_name)
+    #     target_str = img_name.split('.')[0]
+    #     #assert len(target_str) == num_char
+    #     target = []
+    #     for char in target_str:
+    #         vec = [0] * num_class
+    #         vec[alphabet.find(char)] = 1
+    #         target += vec
+    #     samples.append((img_path, target))
+    # return samples
+    img = os.listdir(data_path)
+    img.sort(key=lambda x: int(x.split('.')[0]))
+    # print(img)
+    df = pd.read_csv("./data/train_label.csv")
     samples = []
-    for img_name in img_names:
-        img_path = os.path.join(data_path, img_name)
-        target_str = img_name.split('.')[0]
-       # assert len(target_str) == num_char
+    for imgname in img:
+        #print(imgname)
+        i = int(imgname.split(".")[0])
+        imgpath = os.path.join(data_path, imgname)
+        label = df['label'][i-1]
+        #print(label)
         target = []
-        for char in target_str:
-            vec = [0] * num_class
+        for char in label:
+            vec = [0] * 62
             vec[alphabet.find(char)] = 1
             target += vec
-        samples.append((img_path, target))
+        samples.append((imgpath, target))
     return samples
+
 
 class CaptchaData(Dataset):
     def __init__(self, data_path, num_class=62, num_char=4,
